@@ -1,4 +1,4 @@
-CREATE DATABASE actividad3
+CREATE DATABASE actividad3;
 \c actividad3
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -9,7 +9,7 @@ CREATE TABLE clientes (
     codigo SERIAL NOT NULL,
     rut NUMERIC(9,0) NOT NULL,
     nombre CHAR(50) NOT NULL,
-    direccion CHAR(100) NOT NULL,
+    direccion CHAR(100) NOT NULL
 );
 
 CREATE TABLE productos (
@@ -22,9 +22,7 @@ CREATE TABLE ventas (
     codigo_cliente NUMERIC(7) NOT NULL,
     codigo_producto NUMERIC(4) NOT NULL,
     cantidad NUMERIC(3) NOT NULL,
-    fecha_venta DATE NOT NULL,
-    FOREIGN KEY (codigo_cliente) REFERENCES clientes(codigo),
-    FOREIGN KEY (codigo_producto) REFERENCES productos(codigo)
+    fecha_venta DATE NOT NULL
 );
 
 -- Obtener datos de personas de tabla anterior
@@ -34,9 +32,11 @@ CREATE TABLE ventas (
 COPY (
     SELECT RUT, Nombre, Direccion
     FROM PERSONAS1
+    LIMIT 5000000
 )
-TO 'ruta/personas5millones.csv'
+TO 'ruta\personas5millones.csv'
 DELIMITER '|' CSV HEADER;
+
 
 -- Poner datos en tablas actuales
 
