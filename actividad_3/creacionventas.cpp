@@ -25,7 +25,7 @@ string date(mt19937& generate){
 }
 
 int cant(mt19937& generate){
-    uniform_int_distribution<int> cant(1,100);
+    uniform_int_distribution<int> cant(1,40);
     return cant(generate);
 }
 
