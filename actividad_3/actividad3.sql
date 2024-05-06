@@ -7,7 +7,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE clientes (
     codigo SERIAL NOT NULL,
-    rut NUMERIC(9,0) NOT NULL,
+    rut NUMERIC(10,0) NOT NULL,
     nombre CHAR(50) NOT NULL,
     direccion CHAR(100) NOT NULL
 );
@@ -34,7 +34,7 @@ COPY (
     FROM PERSONAS1
     LIMIT 5000000
 )
-TO 'ruta\personas5millones.csv'
+TO 'C:\Users\diego\OneDrive\Documentos\1PDFCLASES\SEMESTRE 5\BASE DE DATOS AVANZADA\actividad3\personas5millones.csv'
 DELIMITER '|' CSV HEADER;
 
 
@@ -42,16 +42,16 @@ DELIMITER '|' CSV HEADER;
 
 \c actividad3
 
-COPY clientes
-FROM 'ruta/personas5millones.csv'
+COPY clientes (rut, nombre, direccion)
+FROM 'C:\Users\diego\OneDrive\Documentos\1PDFCLASES\SEMESTRE 5\BASE DE DATOS AVANZADA\actividad3\personas5millones.csv'
 DELIMITER '|' CSV HEADER;
 
-COPY productos
-FROM 'ruta/productos1000.csv'
+COPY productos (nombre, precio)
+FROM 'C:\Users\diego\OneDrive\Documentos\1PDFCLASES\SEMESTRE 5\BASE DE DATOS AVANZADA\actividad3\productos1000.csv'
 DELIMITER '|' CSV HEADER;
 
 COPY ventas
-FROM 'ruta/ventas200millones.csv'
+FROM 'C:\Users\diego\OneDrive\Documentos\1PDFCLASES\SEMESTRE 5\BASE DE DATOS AVANZADA\actividad3\ventas200millones.csv'
 DELIMITER '|' CSV HEADER;
 
 -- PARTE 1 --
