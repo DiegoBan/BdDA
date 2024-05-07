@@ -42,7 +42,7 @@ int main(){
     csv<<"codigo_cliente|codigo_producto|cantidad|fecha_venta"<<endl;
     for(int i = 1 ; i <= 5000000 ; i++){
         for(int j = 0 ; j < 40 ; j++){
-            producto = producto >= 1000 ? 1 : producto;
+            producto = producto > 1000 ? 1 : producto;
             csv<<i<<"|"<<producto<<"|"<<cant(generate)<<"|"<<date(generate)<<endl;
             producto++;
         }
