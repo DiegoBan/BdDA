@@ -7,7 +7,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE clientes (
     codigo SERIAL NOT NULL,
-    rut NUMERIC(10,0) NOT NULL,
+    rut NUMERIC(10) NOT NULL,
     nombre CHAR(50) NOT NULL,
     direccion CHAR(100) NOT NULL
 );
@@ -113,3 +113,66 @@ JOIN ventas v ON c.codigo = v.codigo_cliente
 JOIN productos p ON v.codigo_producto = p.codigo
 WHERE p.nombre = 'nombre_variable'
 GROUP BY c.nombre, c.rut;
+
+-- PARTE 2 --
+/* Creacion de nueva base de datos desnormalizada */
+
+CREATE DATABASE actividad3_2;
+\c actividad3_2
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TABLE ventas (
+    cliente_codigo NUMERIC(7) NOT NULL,
+    cliente_rut NUMERIC(10) NOT NULL,
+    cliente_nombre CHAR(50) NOT NULL,
+    cliente_direccion CHAR(100) NOT NULL,
+    producto_codigo NUMERIC(4) NOT NULL,
+    producto_nombre CHAR(20) NOT NULL,
+    producto_precio NUMERIC(4,0) NOT NULL,
+    cantidad NUMERIC(3) NOT NULL,
+    fecha_venta DATE NOT NULL
+);
+
+-- Extraer datos de las tablas anteriores
+\c actividad3
+
+COPY(
+    SELECT c.codigo, c.rut, c.nombre, c.direccion,
+    p.codigo, p.nombre, p.precio, v.cantidad, v.fecha_venta
+    FROM clientes c
+    JOIN ventas v ON c.codigo = v.codigo_cliente
+    JOIN productos p ON v.codigo_producto = p.codigo;
+) TO 'ruta/basedesnormalizada.csv'
+DELIMITER '|' CSV HEADER;
+
+-- Insertar datos en segunda base
+\c actividad3_2
+
+COPY ventas (cliente_codigo, cliente_rut, cliente_nombre, cliente_direccion,
+    producto_codigo, producto_nombre, producto_precio, cantidad, fecha_venta)
+FROM 'ruta/basedesnormalizada.csv'
+DELIMITER '|' CSV HEADER;
+
+-- Transaccion de venta
+
+INSERT INTO ventas()
+
+-- Consultas --
+-- 1)
+
+SELECT cliente_nombre, SUM(producto_precio*cantidad) AS monto_total
+FROM ventas
+GROUP BY cliente_rut
+HAVING SUM(producto_precio*cantidad) = (
+    SELECT MAX(monto)
+    FROM (
+        SELECT SUM(producto_precio*cantidad) AS monto
+        FROM ventas
+        GROUP BY cliente_rut
+    )
+);
+
+-- 2)
+
+SELECT producto_codigo
