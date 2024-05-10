@@ -189,14 +189,14 @@ HAVING SUM(producto_precio*cantidad) = (
 SELECT producto_codigo, producto_nombre
 FROM ventas
 WHERE fecha_venta BETWEEN 'fecha_inicio' AND 'fecha_final'
-GROUP BY producto_codigo
+GROUP BY producto_codigo, producto_nombre
 HAVING SUM(cantidad) = (
     SELECT MAX(cant)
     FROM (
         SELECT SUM(cantidad) AS cant
         FROM ventas
         WHERE fecha_venta BETWEEN 'fecha inicio' AND 'fecha_final'
-        GROUP BY producto_codigo
+        GROUP BY producto_codigo, producto_nombre
     )
 );
 
