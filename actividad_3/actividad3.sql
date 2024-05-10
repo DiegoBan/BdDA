@@ -7,7 +7,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE clientes (
     codigo SERIAL NOT NULL,
-    rut NUMERIC(10) NOT NULL,
+    rut NUMERIC(10,0) NOT NULL,
     nombre CHAR(50) NOT NULL,
     direccion CHAR(100) NOT NULL
 );
@@ -34,7 +34,7 @@ COPY (
     FROM PERSONAS1
     LIMIT 5000000
 )
-TO 'C:\Users\diego\OneDrive\Documentos\1PDFCLASES\SEMESTRE 5\BASE DE DATOS AVANZADA\actividad3\personas5millones.csv'
+TO 'ruta\personas5millones.csv'
 DELIMITER '|' CSV HEADER;
 
 
@@ -42,16 +42,17 @@ DELIMITER '|' CSV HEADER;
 
 \c actividad3
 
+--se especifica el nombre de las columnas a la que iran los datos del archivo
 COPY clientes (rut, nombre, direccion)
-FROM 'C:\Users\diego\OneDrive\Documentos\1PDFCLASES\SEMESTRE 5\BASE DE DATOS AVANZADA\actividad3\personas5millones.csv'
+FROM 'ruta\personas5millones.csv'
 DELIMITER '|' CSV HEADER;
 
 COPY productos (nombre, precio)
-FROM 'C:\Users\diego\OneDrive\Documentos\1PDFCLASES\SEMESTRE 5\BASE DE DATOS AVANZADA\actividad3\productos1000.csv'
+FROM 'ruta\productos1000.csv'
 DELIMITER '|' CSV HEADER;
 
-COPY ventas
-FROM 'C:\Users\diego\OneDrive\Documentos\1PDFCLASES\SEMESTRE 5\BASE DE DATOS AVANZADA\actividad3\ventas200millones.csv'
+COPY ventas (codigo_cliente, codigo_producto, cantidad, fecha_venta)
+FROM 'ruta\ventas200millones.csv'
 DELIMITER '|' CSV HEADER;
 
 -- PARTE 1 --
@@ -66,7 +67,7 @@ INSERT INTO ventas(
     cantidad,
     fecha_venta
 )
-SELECT c.codigo, p.codigo, 40, CURRENT_DATE
+SELECT c.codigo, p.codigo, 10, CURRENT_DATE
 FROM clientes c, productos p
 WHERE c.nombre = 'nombre'
 AND p.nombre = 'productox';
@@ -77,15 +78,15 @@ SELECT c.nombre, SUM(p.precio * v.cantidad) AS monto
 FROM clientes c
 JOIN ventas v ON c.codigo = v.codigo_cliente
 JOIN productos p ON p.codigo = v.codigo_producto
-GROUP BY c.codigo
-HAVING monto = (
+GROUP BY c.nombre
+HAVING SUM(p.precio * v.cantidad) = (
     SELECT MAX(monto_total)
     FROM (
         SELECT SUM(p1.precio * v1.cantidad) AS monto_total
         FROM productos p1
         JOIN ventas v1 ON p1.codigo = v1.codigo_producto
-        GROUP BY v2.codigo_cliente
-    )
+        GROUP BY v1.codigo_cliente
+    ) AS subconsulta
 );
 
 -- 2) Código y Nombre del producto con la mayor cantidad acumulada de ventas en un rango de tiempo variable
