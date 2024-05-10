@@ -124,7 +124,6 @@ CREATE DATABASE actividad3_2;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE ventas (
-    cliente_codigo NUMERIC(7) NOT NULL,
     cliente_rut NUMERIC(10) NOT NULL,
     cliente_nombre CHAR(50) NOT NULL,
     cliente_direccion CHAR(100) NOT NULL,
@@ -139,7 +138,7 @@ CREATE TABLE ventas (
 \c actividad3
 
 COPY(
-    SELECT c.codigo, c.rut, c.nombre, c.direccion,
+    SELECT c.rut, c.nombre, c.direccion,
     p.codigo, p.nombre, p.precio, v.cantidad, v.fecha_venta
     FROM clientes c
     JOIN ventas v ON c.codigo = v.codigo_cliente
@@ -150,19 +149,19 @@ DELIMITER '|' CSV HEADER;
 -- Insertar datos en segunda base
 \c actividad3_2
 
-COPY ventas (cliente_codigo, cliente_rut, cliente_nombre, cliente_direccion,
+COPY ventas (cliente_rut, cliente_nombre, cliente_direccion,
     producto_codigo, producto_nombre, producto_precio, cantidad, fecha_venta)
 FROM 'ruta/basedesnormalizada.csv'
 DELIMITER '|' CSV HEADER;
 
 -- Transaccion de venta
 INSERT INTO ventas (
-    cliente_codigo, cliente_rut, cliente_nombre, cliente_direccion,
+    cliente_rut, cliente_nombre, cliente_direccion,
     producto_codigo, producto_nombre, producto_precio,
     cantidad, fecha_venta
 )
 SELECT
-    cliente_codigo, cliente_rut, cliente_nombre, cliente_direccion,
+    cliente_rut, cliente_nombre, cliente_direccion,
     producto_codigo, producto_nombre, producto_precio,
     10 AS cantidad,    
     CURRENT_DATE AS fecha_venta
