@@ -174,6 +174,23 @@ INSERT INTO ventas(
     CURRENT_DATE    -- Fecha
 );
 
+-- Segundo insert en base de datos
+INSERT INTO ventas(
+    cliente_codigo, cliente_rut, cliente_nombre, cliente_direccion
+    producto_codigo, producto_nombre, producto_precio,
+    cantidad, fecha_venta
+) VALUES (
+    (SELECT cliente_codigo FROM ventas WHERE cliente_nombre = 'nombreCliente' LIMIT 1), -- cliente_codigo
+    (SELECT cliente_rut FROM ventas WHERE cliente_nombre = 'nombreCliente' LIMIT 1), -- cliente_rut
+    'nombreCliente', -- cliente_nombre
+    (SELECT cliente_direccion FROM ventas WHERE cliente_nombre = 'nombreCLiente' LIMIT 1), -- cliente_direccion
+    (SELECT producto_codigo FROM ventas WHERE producto_nombre = 'nombreProducto' LIMIT 1), -- producto_codigo
+    'nombreProducto', -- producto_nombre
+    (SELECT producto_precio FROM ventas WHERE producto_nombre = 'nombreProducto' LIMIT 1), -- producto_precio
+    10, -- Cantidad
+    CURRENT_DATE -- Fecha
+);
+
 -- Consultas --
 -- 1) Nombre del mejor cliente y monto total comprado
 
