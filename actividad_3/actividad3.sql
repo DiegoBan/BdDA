@@ -142,7 +142,7 @@ COPY(
     p.codigo, p.nombre, p.precio, v.cantidad, v.fecha_venta
     FROM clientes c
     JOIN ventas v ON c.codigo = v.codigo_cliente
-    JOIN productos p ON v.codigo_producto = p.codigo;
+    JOIN productos p ON v.codigo_producto = p.codigo
 ) TO 'ruta/basedesnormalizada.csv'
 DELIMITER '|' CSV HEADER;
 
