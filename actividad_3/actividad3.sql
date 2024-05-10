@@ -155,6 +155,7 @@ FROM 'ruta/basedesnormalizada.csv'
 DELIMITER '|' CSV HEADER;
 
 -- Transaccion de venta
+
 INSERT INTO ventas (
     cliente_rut, cliente_nombre, cliente_direccion,
     producto_codigo, producto_nombre, producto_precio,
@@ -197,7 +198,7 @@ HAVING SUM(cantidad) = (
         WHERE fecha_venta BETWEEN 'fecha inicio' AND 'fecha_final'
         GROUP BY producto_codigo
     )
-)
+);
 
 -- 3) Nombre y Rut de todos los clientes que han comprado un producto específico identificado por su nombre
 
