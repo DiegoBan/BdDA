@@ -156,7 +156,22 @@ DELIMITER '|' CSV HEADER;
 
 -- Transaccion de venta
 
-INSERT INTO ventas()
+INSERT INTO ventas(
+    cliente_codigo, cliente_rut, cliente_nombre, cliente_direccion
+    producto_codigo, producto_nombre, producto_precio,
+    cantidad, fecha_venta
+) VALUES (
+    (
+        SELECT cliente_codigo, cliente_rut, cliente_nombre, cliente_direccion
+        FROM ventas WHERE cliente_codigo = 'nombreCliente'
+    ),
+    (
+        SELECT producto_codigo, producto_nombre, producto_precio
+        FROM ventas WHERE producto = 'nombreProducto'
+    ),
+    10,    -- Cantidad
+    CURRENT_DATE    -- Fecha
+);
 
 -- Consultas --
 -- 1)
