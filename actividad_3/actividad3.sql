@@ -175,7 +175,7 @@ INSERT INTO ventas(
 );
 
 -- Consultas --
--- 1)
+-- 1) Nombre del mejor cliente y monto total comprado
 
 SELECT cliente_nombre, SUM(producto_precio*cantidad) AS monto_total
 FROM ventas
@@ -189,6 +189,25 @@ HAVING SUM(producto_precio*cantidad) = (
     )
 );
 
--- 2)
+-- 2) Código y Nombre del producto con la mayor cantidad acumulada de ventas en un rango de tiempo variable
 
-SELECT producto_codigo
+SELECT producto_codigo, producto_nombre
+FROM ventas
+WHERE fecha_venta BETWEEN 'fecha_inicio' AND 'fecha_final'
+GROUP BY producto_codigo
+HAVING SUM(cantidad) = (
+    SELECT MAX(cant)
+    FROM (
+        SELECT SUM(cantidad) AS cant
+        FROM ventas
+        WHERE fecha_venta BETWEEN 'fecha inicio' AND 'fecha_final'
+        GROUP BY producto_codigo
+    )
+)
+
+-- 3) Nombre y Rut de todos los clientes que han comprado un producto específico identificado por su nombre
+
+SELECT cliente_nombre, cliente_rut
+FROM ventas
+WHERE producto_nombre = 'nombre_variable'
+GROUP BY cliente_nombre, clientes_rut;
