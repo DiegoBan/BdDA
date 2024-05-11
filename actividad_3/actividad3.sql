@@ -34,7 +34,7 @@ COPY (
     FROM PERSONAS1
     LIMIT 5000000
 )
-TO 'ruta\personas5millones.csv'
+TO 'C:\Users\diego\OneDrive\Documentos\1PDFCLASES\SEMESTRE 5\BASE DE DATOS AVANZADA\actividad3\personas5millones.csv'
 DELIMITER '|' CSV HEADER;
 
 
@@ -44,15 +44,15 @@ DELIMITER '|' CSV HEADER;
 
 --se especifica el nombre de las columnas a la que iran los datos del archivo
 COPY clientes (rut, nombre, direccion)
-FROM 'ruta\personas5millones.csv'
+FROM 'C:\Users\diego\OneDrive\Documentos\1PDFCLASES\SEMESTRE 5\BASE DE DATOS AVANZADA\actividad3\personas5millones.csv'
 DELIMITER '|' CSV HEADER;
 
 COPY productos (nombre, precio)
-FROM 'ruta\productos1000.csv'
+FROM 'C:\Users\diego\OneDrive\Documentos\1PDFCLASES\SEMESTRE 5\BASE DE DATOS AVANZADA\actividad3\productos1000.csv'
 DELIMITER '|' CSV HEADER;
 
 COPY ventas (codigo_cliente, codigo_producto, cantidad, fecha_venta)
-FROM 'ruta\ventas200millones.csv'
+FROM 'C:\Users\diego\OneDrive\Documentos\1PDFCLASES\SEMESTRE 5\BASE DE DATOS AVANZADA\actividad3\ventas200millones.csv'
 DELIMITER '|' CSV HEADER;
 
 -- PARTE 1 --
@@ -115,6 +115,7 @@ JOIN productos p ON v.codigo_producto = p.codigo
 WHERE p.nombre = 'nombre_variable'
 GROUP BY c.nombre, c.rut;
 
+
 -- PARTE 2 --
 /* Creacion de nueva base de datos desnormalizada */
 
@@ -123,54 +124,53 @@ CREATE DATABASE actividad3_2;
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
+CREATE TABLE clientes (
+    codigo SERIAL NOT NULL,
+    rut NUMERIC(10,0) NOT NULL,
+    nombre CHAR(50) NOT NULL,
+    direccion CHAR(100) NOT NULL
+);
+
 CREATE TABLE ventas (
-    cliente_rut NUMERIC(10) NOT NULL,
-    cliente_nombre CHAR(50) NOT NULL,
-    cliente_direccion CHAR(100) NOT NULL,
-    producto_codigo NUMERIC(4) NOT NULL,
+    codigo_clientes NUMERIC(7) NOT NULL,
     producto_nombre CHAR(20) NOT NULL,
-    producto_precio NUMERIC(4,0) NOT NULL,
+    producto_precio NUMERIC(4) NOT NULL,
     cantidad NUMERIC(3) NOT NULL,
     fecha_venta DATE NOT NULL
 );
 
--- Extraer datos de las tablas anteriores
-\c actividad3
-
+--extraer datos de la base anterior
 COPY(
-    SELECT c.rut, c.nombre, c.direccion,
-    p.codigo, p.nombre, p.precio, v.cantidad, v.fecha_venta
+    SELECT c.codigo, p.nombre, p.precio, v.cantidad, v.fecha_venta
     FROM clientes c
     JOIN ventas v ON c.codigo = v.codigo_cliente
     JOIN productos p ON v.codigo_producto = p.codigo
-) TO 'ruta/basedesnormalizada.csv'
+) TO 'C:\Users\diego\OneDrive\Documentos\1PDFCLASES\SEMESTRE 5\BASE DE DATOS AVANZADA\actividad3\ventasproductos.csv'
 DELIMITER '|' CSV HEADER;
 
--- Insertar datos en segunda base
-\c actividad3_2
-
-COPY ventas (cliente_rut, cliente_nombre, cliente_direccion,
-    producto_codigo, producto_nombre, producto_precio, cantidad, fecha_venta)
-FROM 'ruta/basedesnormalizada.csv'
+--copiar datos en la base nueva
+--se especifica el nombre de las columnas a la que iran los datos del archivo
+COPY clientes (rut, nombre, direccion)
+FROM 'C:\Users\diego\OneDrive\Documentos\1PDFCLASES\SEMESTRE 5\BASE DE DATOS AVANZADA\actividad3\personas5millones.csv'
 DELIMITER '|' CSV HEADER;
+
+COPY ventas (codigo_clientes, producto_nombre, producto_precio, cantidad, fecha_venta)
+FROM 'C:\Users\diego\OneDrive\Documentos\1PDFCLASES\SEMESTRE 5\BASE DE DATOS AVANZADA\actividad3\ventasproductos.csv'
+DELIMITER '|' CSV HEADER;
+
 
 -- Transaccion de venta
 
-INSERT INTO ventas (
-    cliente_rut, cliente_nombre, cliente_direccion,
-    producto_codigo, producto_nombre, producto_precio,
-    cantidad, fecha_venta
-)
-SELECT
-    cliente_rut, cliente_nombre, cliente_direccion,
-    producto_codigo, producto_nombre, producto_precio,
-    10 AS cantidad,    
-    CURRENT_DATE AS fecha_venta
-FROM ventas
-WHERE cliente_nombre = 'nombre_del_cliente' AND producto_nombre = 'nombre_producto';
+INSERT INTO ventas(cliente_codigo, producto_nombre, producto_precio, cantidad, fecha_venta)
+SELECT c.codigo AS cliente_codigo, v.producto_nombre, v.producto_precio,
+10 AS cantidad
+CURRENT_DATE AS fecha_venta
+FROM ventas v, clientes c
+WHERE ventas.producto_nombre = 'nombreProducto'
+AND c.nombre = 'nombre_cliente';
 
 -- Consultas --
--- 1) Nombre del mejor cliente y monto total comprado
+-- 1)
 
 SELECT c.nombre AS cliente_nombre, 
        SUM(v.producto_precio * v.cantidad) AS monto_total
@@ -190,14 +190,14 @@ HAVING SUM(v.producto_precio * v.cantidad) = (
 
 SELECT producto_codigo, producto_nombre
 FROM ventas
-WHERE fecha_venta BETWEEN 'fecha_inicial' AND 'fecha_final'
+WHERE fecha_venta BETWEEN '2023-09-10' AND '2024-03-24'
 GROUP BY producto_codigo, producto_nombre
 HAVING SUM(cantidad) = (
     SELECT MAX(cant)
     FROM (
         SELECT SUM(cantidad) AS cant
         FROM ventas
-        WHERE fecha_venta BETWEEN 'fecha_inicial' AND 'fecha_final'
+        WHERE fecha_venta BETWEEN '2023-09-10' AND '2024-03-24'
         GROUP BY producto_codigo, producto_nombre
     ) AS subconsulta
 );
@@ -207,42 +207,8 @@ HAVING SUM(cantidad) = (
 SELECT c.nombre AS cliente_nombre, c.rut AS cliente_rut
 FROM ventas v
 JOIN clientes c ON v.codigo_clientes = c.codigo
-WHERE v.producto_nombre = 'nombre_variable'
+WHERE v.producto_nombre = 'producto500'
 GROUP BY c.nombre, c.rut;
 
 
--- NUEVA NORMALIZACION --
-CREATE TABLE clientes (
-    codigo SERIAL NOT NULL,
-    rut NUMERIC(10,0) NOT NULL,
-    nombre CHAR(50) NOT NULL,
-    direccion CHAR(100) NOT NULL
-);
-CREATE TABLE ventas (
-    codigo_cliente NUMERIC(7) NOT NULL,
-    producto_nombre CHAR(20) NOT NULL,
-    producto_precio NUMERIC(4) NOT NULL,
-    cantidad NUMERIC(3) NOT NULL,
-    fecha_venta DATE NOT NULL
-);
 
-COPY(
-    SELECT c.codigo, p.nombre, p.precio, v.cantidad, v.fecha_venta
-    FROM clientes c
-    JOIN ventas v ON c.codigo = v.codigo_cliente
-    JOIN productos p ON v.codigo_producto = p.codigo
-) TO 'ruta/ventasproductos.csv'
-DELIMITER '|' CSV HEADER;
-
-COPY ventas (codigo_clientes, producto_nombre, producto_precio, cantidad, fecha_venta)
-FROM 'ruta/ventasproductos.csv'
-DELIMITER '|' CSV HEADER;
-
--- Insercion de venta
-INSERT INTO ventas(cliente_codigo, producto_nombre, producto_precio, cantidad, fecha_venta)
-SELECT c.codigo AS cliente_codigo, v.producto_nombre, v.producto_precio,
-10 AS cantidad
-CURRENT_DATE AS fecha_venta
-FROM ventas v, clientes c
-WHERE ventas.producto_nombre = 'nombreProducto'
-AND c.nombre = 'nombre_cliente';
