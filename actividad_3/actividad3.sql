@@ -234,12 +234,15 @@ COPY(
 ) TO 'ruta/ventasproductos.csv'
 DELIMITER '|' CSV HEADER;
 
-COPY clientes (cliente_rut, cliente_nombre, cliente_direccion,
-    producto_codigo, producto_nombre, producto_precio, cantidad, fecha_venta)
-FROM 'ruta/basedesnormalizada.csv'
-DELIMITER '|' CSV HEADER;
-
 COPY ventas (codigo_cliente, producto_nombre, producto_precio, cantidad, fecha_venta)
 FROM 'ruta/ventasproductos.csv'
 DELIMITER '|' CSV HEADER;
 
+-- Insercion de venta
+INSERT INTO ventas(cliente_codigo, producto_nombre, producto_precio, cantidad, fecha_venta)
+SELECT c.codigo AS cliente_codigo, v.producto_nombre, v.producto_precio,
+10 AS cantidad
+CURRENT_DATE AS fecha_venta
+FROM ventas v, clientes c
+WHERE ventas.producto_nombre = 'nombreProducto'
+AND c.nombre = 'nombre_cliente';
