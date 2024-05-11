@@ -190,16 +190,16 @@ HAVING SUM(v.producto_precio * v.cantidad) = (
 
 SELECT producto_codigo, producto_nombre
 FROM ventas
-WHERE fecha_venta BETWEEN 'fecha_inicio' AND 'fecha_final'
+WHERE fecha_venta BETWEEN 'fecha_inicial' AND 'fecha_final'
 GROUP BY producto_codigo, producto_nombre
 HAVING SUM(cantidad) = (
     SELECT MAX(cant)
     FROM (
         SELECT SUM(cantidad) AS cant
         FROM ventas
-        WHERE fecha_venta BETWEEN 'fecha inicio' AND 'fecha_final'
+        WHERE fecha_venta BETWEEN 'fecha_inicial' AND 'fecha_final'
         GROUP BY producto_codigo, producto_nombre
-    )
+    ) AS subconsulta
 );
 
 -- 3) Nombre y Rut de todos los clientes que han comprado un producto específico identificado por su nombre
