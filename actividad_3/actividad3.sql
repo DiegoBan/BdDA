@@ -94,14 +94,14 @@ HAVING SUM(p.precio * v.cantidad) = (
 SELECT p.codigo, p.nombre
 FROM productos p
 JOIN ventas v ON p.codigo = v.codigo_producto
-WHERE v.fecha_venta BETWEEN 'fecha_inicio' AND 'fecha_final'
+WHERE v.fecha_venta BETWEEN '2017-01-01' AND '2022-10-31'
 GROUP BY p.codigo, p.nombre
 HAVING SUM(v.cantidad) = (
     SELECT MAX(cant)
     FROM (
         SELECT SUM(v1.cantidad) AS cant
         FROM ventas v1
-        WHERE v1.fecha_venta BETWEEN 'fecha_inicio' AND 'fecha_final'
+        WHERE v1.fecha_venta BETWEEN '2017-01-01' AND '2022-10-31'
         GROUP BY v1.codigo_producto
     )
 );
@@ -112,7 +112,7 @@ SELECT c.nombre, c.rut
 FROM clientes c
 JOIN ventas v ON c.codigo = v.codigo_cliente
 JOIN productos p ON v.codigo_producto = p.codigo
-WHERE p.nombre = 'nombre_variable'
+WHERE p.nombre = 'producto500'
 GROUP BY c.nombre, c.rut;
 
 
@@ -162,12 +162,13 @@ DELIMITER '|' CSV HEADER;
 
 -- Transaccion de venta
 
-INSERT INTO ventas(cliente_codigo, producto_nombre, producto_precio, cantidad, fecha_venta)
-SELECT c.codigo AS cliente_codigo, v.producto_nombre, v.producto_precio,
-10 AS cantidad
-CURRENT_DATE AS fecha_venta
-FROM ventas v, clientes c
-WHERE ventas.producto_nombre = 'nombreProducto'
+INSERT INTO ventas(codigo_clientes, producto_codigo, producto_nombre, producto_precio, cantidad, fecha_venta)
+SELECT c.codigo AS codigo_clientes, v.producto_codigo, v.producto_nombre, v.producto_precio,
+       10 AS cantidad,
+       CURRENT_DATE AS fecha_venta
+FROM ventas v
+JOIN clientes c ON v.codigo_clientes = c.codigo
+WHERE v.producto_nombre = 'nombreProducto'
 AND c.nombre = 'nombre_cliente';
 
 -- Consultas --
@@ -210,6 +211,3 @@ FROM ventas v
 JOIN clientes c ON v.codigo_clientes = c.codigo
 WHERE v.producto_nombre = 'producto500'
 GROUP BY c.nombre, c.rut;
-
-
-
