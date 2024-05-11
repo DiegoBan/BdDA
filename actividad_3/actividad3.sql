@@ -216,7 +216,7 @@ CREATE TABLE clientes (
     direccion CHAR(100) NOT NULL
 );
 CREATE TABLE ventas (
-    codigo_clientes NUMERIC(7) NOT NULL,
+    codigo_cliente NUMERIC(7) NOT NULL,
     producto_nombre CHAR(20) NOT NULL,
     producto_precio NUMERIC(4) NOT NULL,
     cantidad NUMERIC(3) NOT NULL,
@@ -230,4 +230,11 @@ COPY(
     JOIN productos p ON v.codigo_producto = p.codigo
 ) TO 'ruta/ventasproductos.csv'
 DELIMITER '|' CSV HEADER;
+
+COPY ventas (cliente_rut, cliente_nombre, cliente_direccion,
+    producto_codigo, producto_nombre, producto_precio, cantidad, fecha_venta)
+FROM 'ruta/basedesnormalizada.csv'
+DELIMITER '|' CSV HEADER;
+
+COPY ventas (codigo_cliente)
 
