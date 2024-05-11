@@ -133,6 +133,7 @@ CREATE TABLE clientes (
 
 CREATE TABLE ventas (
     codigo_clientes NUMERIC(7) NOT NULL,
+    producto_codigo NUMERIC(4) NOT NULL,
     producto_nombre CHAR(20) NOT NULL,
     producto_precio NUMERIC(4) NOT NULL,
     cantidad NUMERIC(3) NOT NULL,
@@ -141,7 +142,7 @@ CREATE TABLE ventas (
 
 --extraer datos de la base anterior
 COPY(
-    SELECT c.codigo, p.nombre, p.precio, v.cantidad, v.fecha_venta
+    SELECT c.codigo, p.codigo, p.nombre, p.precio, v.cantidad, v.fecha_venta
     FROM clientes c
     JOIN ventas v ON c.codigo = v.codigo_cliente
     JOIN productos p ON v.codigo_producto = p.codigo
@@ -154,7 +155,7 @@ COPY clientes (rut, nombre, direccion)
 FROM 'C:\Users\diego\OneDrive\Documentos\1PDFCLASES\SEMESTRE 5\BASE DE DATOS AVANZADA\actividad3\personas5millones.csv'
 DELIMITER '|' CSV HEADER;
 
-COPY ventas (codigo_clientes, producto_nombre, producto_precio, cantidad, fecha_venta)
+COPY ventas (codigo_clientes, producto_codigo, producto_nombre, producto_precio, cantidad, fecha_venta)
 FROM 'C:\Users\diego\OneDrive\Documentos\1PDFCLASES\SEMESTRE 5\BASE DE DATOS AVANZADA\actividad3\ventasproductos.csv'
 DELIMITER '|' CSV HEADER;
 
@@ -190,14 +191,14 @@ HAVING SUM(v.producto_precio * v.cantidad) = (
 
 SELECT producto_codigo, producto_nombre
 FROM ventas
-WHERE fecha_venta BETWEEN '2023-09-10' AND '2024-03-24'
+WHERE fecha_venta BETWEEN '2017-01-01' AND '2022-10-31'
 GROUP BY producto_codigo, producto_nombre
 HAVING SUM(cantidad) = (
     SELECT MAX(cant)
     FROM (
         SELECT SUM(cantidad) AS cant
         FROM ventas
-        WHERE fecha_venta BETWEEN '2023-09-10' AND '2024-03-24'
+        WHERE fecha_venta BETWEEN '2017-01-01' AND '2022-10-31'
         GROUP BY producto_codigo, producto_nombre
     ) AS subconsulta
 );
