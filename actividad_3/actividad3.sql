@@ -206,3 +206,28 @@ SELECT cliente_nombre, cliente_rut
 FROM ventas
 WHERE producto_nombre = 'nombre_variable'
 GROUP BY cliente_nombre, clientes_rut;
+
+
+-- NUEVA NORMALIZACION --
+CREATE TABLE clientes (
+    codigo SERIAL NOT NULL,
+    rut NUMERIC(10,0) NOT NULL,
+    nombre CHAR(50) NOT NULL,
+    direccion CHAR(100) NOT NULL
+);
+CREATE TABLE ventas (
+    codigo_clientes NUMERIC(7) NOT NULL,
+    producto_nombre CHAR(20) NOT NULL,
+    producto_precio NUMERIC(4) NOT NULL,
+    cantidad NUMERIC(3) NOT NULL,
+    fecha_venta DATE NOT NULL
+);
+
+COPY(
+    SELECT c.codigo, p.nombre, p.precio, v.cantidad, v.fecha_venta
+    FROM clientes c
+    JOIN ventas v ON c.codigo = v.codigo_cliente
+    JOIN productos p ON v.codigo_producto = p.codigo
+) TO 'ruta/ventasproductos.csv'
+DELIMITER '|' CSV HEADER;
+
