@@ -172,16 +172,18 @@ WHERE cliente_nombre = 'nombre_del_cliente' AND producto_nombre = 'nombre_produc
 -- Consultas --
 -- 1) Nombre del mejor cliente y monto total comprado
 
-SELECT cliente_nombre, SUM(producto_precio*cantidad) AS monto_total
-FROM ventas
-GROUP BY cliente_rut
-HAVING SUM(producto_precio*cantidad) = (
+SELECT c.nombre AS cliente_nombre, 
+       SUM(v.producto_precio * v.cantidad) AS monto_total
+FROM ventas v
+JOIN clientes c ON v.codigo_clientes = c.codigo
+GROUP BY c.nombre
+HAVING SUM(v.producto_precio * v.cantidad) = (
     SELECT MAX(monto)
     FROM (
-        SELECT SUM(producto_precio*cantidad) AS monto
+        SELECT SUM(producto_precio * cantidad) AS monto
         FROM ventas
-        GROUP BY cliente_rut
-    )
+        GROUP BY codigo_clientes
+    ) AS subconsulta
 );
 
 -- 2) Código y Nombre del producto con la mayor cantidad acumulada de ventas en un rango de tiempo variable
