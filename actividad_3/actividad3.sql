@@ -234,7 +234,7 @@ COPY(
 ) TO 'ruta/ventasproductos.csv'
 DELIMITER '|' CSV HEADER;
 
-COPY ventas (codigo_cliente, producto_nombre, producto_precio, cantidad, fecha_venta)
+COPY ventas (codigo_clientes, producto_nombre, producto_precio, cantidad, fecha_venta)
 FROM 'ruta/ventasproductos.csv'
 DELIMITER '|' CSV HEADER;
 
