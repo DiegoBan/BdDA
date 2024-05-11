@@ -204,10 +204,11 @@ HAVING SUM(cantidad) = (
 
 -- 3) Nombre y Rut de todos los clientes que han comprado un producto específico identificado por su nombre
 
-SELECT cliente_nombre, cliente_rut
-FROM ventas
-WHERE producto_nombre = 'nombre_variable'
-GROUP BY cliente_nombre, clientes_rut;
+SELECT c.nombre AS cliente_nombre, c.rut AS cliente_rut
+FROM ventas v
+JOIN clientes c ON v.codigo_clientes = c.codigo
+WHERE v.producto_nombre = 'nombre_variable'
+GROUP BY c.nombre, c.rut;
 
 
 -- NUEVA NORMALIZACION --
