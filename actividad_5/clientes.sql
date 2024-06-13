@@ -2,7 +2,8 @@
 
 COPY (
     SELECT Codigo, RUT, Nombre
-    FROM PERSONAS1
+    FROM clientes
+    ORDER BY codigo
     LIMIT 5000
 )
 TO 'ruta/clientes.csv'
