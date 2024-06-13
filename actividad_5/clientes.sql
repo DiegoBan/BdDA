@@ -1,7 +1,7 @@
-\c Actividad1
+\c actividad3
 
 COPY (
-    SELECT RUT, Nombre, Direccion
+    SELECT Codigo, RUT, Nombre
     FROM PERSONAS1
     LIMIT 5000
 )
